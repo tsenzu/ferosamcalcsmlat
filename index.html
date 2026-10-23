@@ -111,6 +111,30 @@ footer{text-align:center;color:#82734f;font-size:12px;margin:23px 0 8px}
   body{padding:20px 11px}.panel{padding:17px}
   .grid,.price-list{grid-template-columns:1fr}
 }
+
+button,
+a,
+img,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+  
+button:focus,
+button:focus-visible,
+a:focus,
+a:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+button,
+img {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 </style>
 </head>
 <body>
