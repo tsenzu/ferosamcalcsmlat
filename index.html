@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -42,8 +42,22 @@ button{
   background:var(--gold);color:#211707;
   border:1px solid var(--gold2);border-radius:2px;
   font:bold 16px Georgia,serif;cursor:pointer;
+  text-shadow:0 0 5px rgba(255,238,170,.7);
+  box-shadow:0 0 7px rgba(216,183,93,.28);
+  transition:background 180ms ease, text-shadow 180ms ease, box-shadow 180ms ease;
 }
-button:hover{background:var(--gold2)}
+button:hover, button:focus-visible{
+  background:var(--gold2);
+  text-shadow:0 0 7px rgba(255,248,210,.95), 0 0 13px rgba(255,220,120,.7);
+  box-shadow:0 0 10px rgba(216,183,93,.55);
+}
+[role="button"], .secret-trigger {
+  transition:text-shadow 180ms ease, filter 180ms ease;
+}
+[role="button"]:hover, [role="button"]:focus-visible,
+.secret-trigger:hover, .secret-trigger:focus-visible {
+  text-shadow:0 0 5px rgba(240,214,139,.85), 0 0 13px rgba(216,183,93,.6);
+}
 .result{display:none}
 .result.visible{display:block}
 .result-label{color:var(--muted);font-size:13px}
@@ -83,6 +97,7 @@ button:hover{background:var(--gold2)}
 .divider{text-align:center;color:#77602f;letter-spacing:12px;margin:20px 0}
 footer{text-align:center;color:#82734f;font-size:12px;margin:23px 0 8px}
 
+/* Скрытые фрагменты в состаренных рамках */
 .secret-overlay{
   position:fixed; inset:0; z-index:9999;
   display:flex; align-items:center; justify-content:center;
@@ -204,6 +219,7 @@ footer{text-align:center;color:#82734f;font-size:12px;margin:23px 0 8px}
   <footer>Приложение принадлежит проекту SMLaT и разработано некой Цензу.</footer>
 </main>
 
+<!-- Архивные фрагменты: закрываются только кнопкой × -->
 <div class="secret-overlay" id="secretOverlay" hidden>
   <section class="secret-frame" role="dialog" aria-modal="true" aria-label="Скрытый фрагмент">
     <button class="secret-close" id="secretClose" type="button" aria-label="Закрыть">×</button>
@@ -303,6 +319,7 @@ function renderPriceList() {
 }
 renderPriceList();
 
+// Окно скрытого фрагмента закрывается только крестиком.
 const secretOverlay = $("secretOverlay");
 const secretImage = $("secretImage");
 const secretClose = $("secretClose");
