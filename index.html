@@ -229,6 +229,7 @@ function formatNumber(value) {
   });
 }
 
+
 function formatTime(hours) {
   if (hours <= 0) return "0 часов (0 дней 0 часов)";
 
@@ -237,22 +238,35 @@ function formatTime(hours) {
   const days = Math.floor(totalHours / 24);
   const remainingHours = totalHours % 24;
 
-  let dayText;
-  if (days === 1) dayText = "1 день";
-  else if (days >= 2 && days <= 4) dayText = days + " дня";
-  else dayText = days + " дней";
+  function pluralize(number, forms) {
+    const n = Math.abs(number) % 100;
+    const lastDigit = n % 10;
 
-  let hourText;
-  if (remainingHours === 1) hourText = "1 час";
-  else if (remainingHours >= 2 && remainingHours <= 4) hourText = remainingHours + " часа";
-  else hourText = remainingHours + " часов";
+    if (n >= 11 && n <= 14) return forms[2];
+    if (lastDigit === 1) return forms[0];
+    if (lastDigit >= 2 && lastDigit <= 4) return forms[1];
+    return forms[2];
+  }
 
-  let parts = [];
+  const dayText = `${days} ${pluralize(days, [
+    "день", "дня", "дней"
+  ])}`;
+
+  const hourText = `${remainingHours} ${pluralize(remainingHours, [
+    "час", "часа", "часов"
+  ])}`;
+
+  const totalHourText = `${totalHours} ${pluralize(totalHours, [
+    "час", "часа", "часов"
+  ])}`;
+
+  const parts = [];
   if (days > 0) parts.push(dayText);
   if (remainingHours > 0 || days === 0) parts.push(hourText);
 
-  return totalHours + " часов (" + parts.join(" ") + ")";
+  return `${totalHourText} (${parts.join(" ")})`;
 }
+
 
 function addRanks(select) {
   for (let rank = 1; rank <= 50; rank++) {
