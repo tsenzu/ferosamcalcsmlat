@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✦ Еще одна лавка?</title>
+  <link rel="preload" as="image" href="mask.png">
+  <link rel="preload" as="image" href="mask-click.png">
+  <link rel="preload" as="image" href="character.png">
+  <link rel="preload" as="image" href="character-click.png">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(ellipse at 50% 35%, #292416 0%, #15130e 45%, #090908 100%);
+      color: #dfc579;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .stars {
+      padding-top: 24px;
+      text-align: center;
+      color: #d8b45a;
+      font-size: 25px;
+      letter-spacing: 12px;
+      user-select: none;
+    }
+
+    main {
+      min-height: calc(100vh - 90px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 15px 20px 55px;
+    }
+
+    .click-area {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: min(330px, 80vw);
+      height: min(330px, 80vw);
+    }
+
+    #mask {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-drag: none;
+      filter: drop-shadow(0 0 16px rgba(216, 180, 90, 0.13));
+      transition: transform 0.12s ease, filter 0.2s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    #mask:hover {
+      filter: drop-shadow(0 0 24px rgba(216, 180, 90, 0.3));
+    }
+
+    #mask:active,
+    #mask.pressed {
+      transform: scale(0.91);
+    }
+
+    .particle {
+      position: absolute;
+      z-index: 3;
+      left: 50%;
+      top: 50%;
+      pointer-events: none;
+      user-select: none;
+      animation: scatter 1.2s ease-out forwards;
+      text-shadow: 0 0 12px rgba(216, 180, 90, 0.4);
+    }
+
+    @keyframes scatter {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+      }
+
+      12% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform:
+          translate(
+            calc(-50% + var(--x)),
+            calc(-50% + var(--y))
+          )
+          rotate(var(--rotation))
+          scale(var(--scale));
+      }
+    }
+
+    .rare-star {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 20;
+      color: #f5d779;
+      pointer-events: none;
+      line-height: 1;
+      transform: translate(-50%, -50%);
+      animation: star-bloom 1.65s ease-out forwards;
+      text-shadow:
+        0 0 10px rgba(245, 215, 121, 0.9),
+        0 0 30px rgba(245, 215, 121, 0.5);
+    }
+
+    @keyframes star-bloom {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.15) rotate(-25deg);
+      }
+
+      25% {
+        opacity: 1;
+      }
+
+      75% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1) rotate(25deg);
+      }
+    }
+
+    .back-link {
+      position: fixed;
+      bottom: 42px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #99865a;
+      font-size: 13px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: #f0cf72;
+    }
+
+    .reward-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(5, 5, 4, 0.86);
+      backdrop-filter: blur(5px);
+      animation: overlay-in 0.3s ease;
+    }
+
+    .reward-overlay[hidden] {
+      display: none;
+    }
+
+    @keyframes overlay-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .reward-card {
+      position: relative;
+      width: min(430px, 100%);
+      padding: 35px 22px 30px;
+      text-align: center;
+      border: 1px solid rgba(216, 180, 90, 0.45);
+      border-radius: 4px;
+      background:
+        radial-gradient(ellipse at top, #292416 0%, #14120d 75%);
+      box-shadow: 0 0 45px rgba(216, 180, 90, 0.08);
+      animation: card-in 0.35s ease;
+    }
+
+    @keyframes card-in {
+      from {
+        opacity: 0;
+        transform: scale(0.94);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .close-button {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      border: none;
+      background: none;
+      color: #b9a36b;
+      font: inherit;
+      font-size: 25px;
+      cursor: pointer;
+    }
+
+    .close-button:hover {
+      color: #fff0b0;
+    }
+
+    .reward-number {
+      margin: 0 0 15px;
+      color: #f0cf72;
+      font-size: clamp(30px, 8vw, 42px);
+      font-weight: bold;
+      text-shadow: 0 0 18px rgba(216, 180, 90, 0.2);
+    }
+
+    .reward-message {
+      color: #d6c89f;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .reward-mask {
+      margin-top: 12px;
+      font-size: 30px;
+    }
+
+    .reward-images {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .reward-images img {
+      width: 75px;
+      height: 75px;
+      object-fit: contain;
+    }
+
+    .star-reward-small {
+      display: block;
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      margin: 18px auto 0;
+    }
+
+    .secret-video-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      background: #000;
+    }
+
+    .secret-video-screen[hidden] {
+      display: none;
+    }
+
+    .secret-video-screen video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .project-note {
+      position: fixed;
+      bottom: 10px;
+      left: 12px;
+      right: 12px;
+      z-index: 10;
+      text-align: center;
+      color: #c9a646;
+      font-size: 11px;
+      line-height: 1.4;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .jackpot-message {
+      color: #f0cf72;
+      font-size: 21px;
+      line-height: 1.6;
+    }
+
+    .jackpot-star {
+      margin-bottom: 20px;
+      color: #f5d779;
+      font-size: 62px;
+      animation: star-glow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes star-glow {
+      from { text-shadow: 0 0 8px rgba(245, 215, 121, 0.3); }
+      to { text-shadow: 0 0 28px rgba(245, 215, 121, 0.9); }
+    }
+
+    @media (max-width: 400px) {
+      .click-area {
+        width: 78vw;
+        height: 78vw;
+      }
+
+      .reward-images img {
+        width: 62px;
+        height: 62px;
+      }
+
+      .project-note {
+        font-size: 10px;
+        bottom: 8px;
+      }
+
+      .back-link {
+        bottom: 42px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .particle,
+      .rare-star,
+      .reward-overlay,
+      .reward-card,
+      .jackpot-star {
+        animation-duration: 0.01ms;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="stars">✦ ✦ ✦</header>
+
+  <main>
+    <div class="click-area" id="clickArea">
+      <img
+        id="mask"
+        src="mask.png"
+        alt="Маска"
+        draggable="false"
+      >
+    </div>
+  </main>
+
+  <a class="back-link" href="index.html">✦ Вернуться к калькулятору</a>
+
+  <footer class="project-note">
+    Все феросамы и рилеши пойдут в фонд помощи на отпуск для Всемасочника
+  </footer>
+
+  <div class="secret-video-screen" id="secretVideoScreen" hidden>
+    <video id="secretVideo" autoplay playsinline loop preload="none" muted>
+      <source src="secret-video.mp4" type="video/mp4">
+      Твой браузер не поддерживает воспроизведение видео.
+    </video>
+  </div>
+
+  <div class="reward-overlay" id="rewardOverlay" hidden>
+    <section
+      class="reward-card"
+      role="dialog"
+      aria-modal="true"
+      aria-live="polite"
+      aria-label="Редкая находка"
+    >
+      <button
+        class="close-button"
+        id="closeReward"
+        type="button"
+        aria-label="Закрыть"
+      >×</button>
+
+      <div id="rewardContent"></div>
+    </section>
+  </div>
+
+  <script>
+    const CHANCE_VIDEO = 0.2;
+    const CHANCE_RILESH = 1;
+    const CHANCE_CHARACTER = 0.8;
+    const CHANCE_ONE = 1.5;
+    const CHANCE_SMALL = 0.67;
+    const CHANCE_JACKPOT = 0.7777;
+
+    const CHARACTER_DURATION = 4000;
+
+    const mask = document.getElementById("mask");
+    const clickArea = document.getElementById("clickArea");
+    const rewardOverlay = document.getElementById("rewardOverlay");
+    const rewardContent = document.getElementById("rewardContent");
+    const closeReward = document.getElementById("closeReward");
+    const secretVideoScreen = document.getElementById("secretVideoScreen");
+    const secretVideo = document.getElementById("secretVideo");
+
+    // Предзагружаем изображения состояний, чтобы мордашка менялась без задержки.
+    const maskImageCache = {};
+    const maskImageReady = Promise.all(
+      ["mask.png", "mask-click.png", "character.png", "character-click.png"].map((src) => {
+        const image = new Image();
+        image.src = src;
+        maskImageCache[src] = image;
+        if (typeof image.decode === "function") {
+          return image.decode().catch(() => undefined);
+        }
+        return new Promise((resolve) => {
+          if (image.complete) resolve();
+          else {
+            image.onload = resolve;
+            image.onerror = resolve;
+          }
+        });
+      })
+    );
+
+    function setMaskImage(src) {
+      const cached = maskImageCache[src];
+      // Сразу используем уже загруженный ресурс; если он ещё загружается,
+      // ждём его декодирования, чтобы браузер не пропустил короткий кадр.
+      if (cached && cached.complete && cached.naturalWidth > 0) {
+        mask.src = cached.src;
+        return Promise.resolve();
+      }
+      return maskImageReady.then(() => {
+        if (cached && cached.naturalWidth > 0) mask.src = cached.src;
+        else mask.src = src;
+      });
+    }
+
+    let busy = false;
+    let characterTimer = null;
+    let animationTimer = null;
+    let characterMode = false;
+
+    let total = Number(localStorage.getItem("maskFerosams") || 0);
+    let totalRileshes = Number(localStorage.getItem("maskRileshes") || 0);
+
+    function createParticles() {
+      const symbols = [
+        "🎭", "🎭", "✦", "✧", "⋆", "✦", "🎭", "✧"
+      ];
+
+      for (let i = 0; i < 13; i++) {
+        const particle = document.createElement("span");
+        particle.className = "particle";
+        particle.textContent =
+          symbols[Math.floor(Math.random() * symbols.length)];
+
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 90 + Math.random() * 150;
+
+        particle.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
+        particle.style.setProperty("--y", `${Math.sin(angle) * distance}px`);
+        particle.style.setProperty("--rotation", `${Math.random() * 300 - 150}deg`);
+        particle.style.setProperty("--scale", `${0.7 + Math.random() * 0.8}`);
+        particle.style.fontSize = `${15 + Math.random() * 17}px`;
+
+        clickArea.appendChild(particle);
+
+        setTimeout(() => particle.remove(), 1300);
+      }
+    }
+
+    function showFourPointStar(size, duration = 1700) {
+      const star = document.createElement("div");
+      star.className = "rare-star";
+      star.textContent = "✦";
+      star.style.fontSize = `${size}px`;
+      star.style.animationDuration = `${duration}ms`;
+
+      document.body.appendChild(star);
+      setTimeout(() => star.remove(), duration + 50);
+    }
+
+    function saveReward(amount) {
+      total = Math.round((total + amount) * 1000) / 1000;
+      localStorage.setItem("maskFerosams", String(total));
+    }
+
+    function showReward(content) {
+      rewardContent.replaceChildren();
+      rewardContent.appendChild(content);
+      rewardOverlay.hidden = false;
+      busy = true;
+    }
+
+    function makeElement(tag, className, text) {
+      const element = document.createElement(tag);
+      element.className = className;
+      element.textContent = text;
+      return element;
+    }
+
+    function showRileshReward() {
+      const content = document.createElement("div");
+      const number = makeElement("div", "reward-number", "+1 рилеш");
+      const message = makeElement("div", "reward-message", "Совсем как настоящий!");
+      const smallImage = document.createElement("img");
+      smallImage.className = "-reward-small";
+      smallImage.src = "star-reward.png";
+      smallImage.alt = "Награда за рилеш";
+
+      content.append(number, message, smallImage);
+      showReward(content);
+    }
+
+    function startSecretVideo() {
+      busy = true;
+      secretVideoScreen.hidden = false;
+      secretVideo.currentTime = 0;
+      const playPromise = secretVideo.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {
+        });
+      }
+    }
+
+    secretVideo.addEventListener("pause", () => {
+      if (!secretVideoScreen.hidden && !secretVideo.ended) {
+        secretVideo.play().catch(() => {});
+      }
+    });
+
+    function changeCharacterTemporarily() {
+      clearTimeout(characterTimer);
+      characterMode = true;
+      busy = false; // Персонажа можно нажимать, пока он отображается.
+      mask.classList.remove("pressed");
+      mask.src = "character.png";
+
+      characterTimer = setTimeout(() => {
+        characterMode = false;
+        mask.classList.remove("pressed");
+        mask.src = "mask.png";
+        busy = false;
+      }, CHARACTER_DURATION);
+    }
+
+    function showOneReward() {
+      const content = document.createElement("div");
+
+      content.append(
+        makeElement("div", "reward-number", "+1 феросам"),
+        makeElement(
+          "div",
+          "reward-message",
+          "Ты выиграл 1 феросам, мои поздравления"
+        ),
+        makeElement("div", "reward-mask", "🎭")
+      );
+
+      showReward(content);
+    }
+
+    function showSmallReward() {
+      const content = document.createElement("div");
+
+      content.appendChild(
+        makeElement("div", "reward-number", "+0,67 феросам")
+      );
+
+      const images = document.createElement("div");
+      images.className = "reward-images";
+
+      ["picture1.png", "picture2.png", "picture3.png"].forEach(
+        (src, index) => {
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = `Изображение рады ${index + 1}`;
+          images.appendChild(img);
+        }
+      );
+
+      content.appendChild(images);
+      showReward(content);
+    }
+
+    function showJackpot() {
+      const content = document.createElement("div");
+
+      content.append(
+        makeElement("div", "jackpot-star", "✦"),
+        makeElement(
+          "div",
+          "jackpot-message",
+          "Джекпот! Ты куда удачливее, чем я думал:)"
+        ),
+        makeElement("div", "reward-number", "+3 феросама")
+      );
+
+      showReward(content);
+    }
+
+    function rollReward() {
+      const roll = Math.random() * 100;
+      let boundary = 0;
+
+      boundary += CHANCE_VIDEO;
+      if (roll < boundary) {
+        startSecretVideo();
+        return true;
+      }
+
+      boundary += CHANCE_RILESH;
+      if (roll < boundary) {
+        totalRileshes = Math.round((totalRileshes + 1) * 1000) / 1000;
+        localStorage.setItem("maskRileshes", String(totalRileshes));
+        showFourPointStar(88, 1600);
+        showRileshReward();
+        return true;
+      }
+
+      boundary += CHANCE_CHARACTER;
+      if (roll < boundary) {
+        changeCharacterTemporarily();
+        return true;
+      }
+
+      boundary += CHANCE_JACKPOT;
+      if (roll < boundary) {
+        saveReward(3);
+        showFourPointStar(105, 1800);
+        showJackpot();
+        return true;
+      }
+
+      boundary += CHANCE_SMALL;
+      if (roll < boundary) {
+        saveReward(0.67);
+        showFourPointStar(70, 1500);
+        showSmallReward();
+        return true;
+      }
+
+      boundary += CHANCE_ONE;
+      if (roll < boundary) {
+        saveReward(1);
+        showFourPointStar(48, 1300);
+        showOneReward();
+        return true;
+      }
+
+      return false;
+    }
+
+    function closeRewardWindow() {
+      rewardOverlay.hidden = true;
+      rewardContent.replaceChildren();
+      busy = false;
+    }
+
+    mask.addEventListener("click", () => {
+      if (characterMode) {
+        createParticles();
+        clearTimeout(animationTimer);
+        mask.classList.add("pressed");
+        setMaskImage("character-click.png");
+        animationTimer = setTimeout(() => {
+          mask.classList.remove("pressed");
+          if (characterMode) setMaskImage("character.png");
+        }, 220);
+        return;
+      }
+
+      if (busy) return;
+
+      busy = true;
+      createParticles();
+
+      const originalSrc = "mask.png";
+      mask.classList.add("pressed");
+      setMaskImage("mask-click.png");
+
+      setTimeout(() => {
+        mask.classList.remove("pressed");
+        setMaskImage(originalSrc);
+      }, 220);
+
+      animationTimer = setTimeout(() => {
+        const eventTriggered = rollReward();
+
+        if (!eventTriggered && rewardOverlay.hidden && secretVideoScreen.hidden) {
+          busy = false;
+        }
+      }, 250);
+    });
+
+    closeReward.addEventListener("click", closeRewardWindow);
+    rewardOverlay.addEventListener("click", (event) => {
+      if (event.target === rewardOverlay) {
+        closeRewardWindow();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !rewardOverlay.hidden) {
+        closeRewardWindow();
+      }
+    });
+  </script>
+
+</body>
+</html>
