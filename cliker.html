@@ -9,12 +9,6 @@
     * {
       box-sizing: border-box;
     }
-    button,
-    a,
-    #mask {
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
 
     body {
       margin: 0;
@@ -61,19 +55,23 @@
       user-select: none;
       -webkit-user-drag: none;
       filter: drop-shadow(0 0 16px rgba(216, 180, 90, 0.13));
-      transition: transform 0.12s ease, filter 0.2s ease;
+      transition: filter 0.18s ease, opacity 0.08s ease;
       position: relative;
       z-index: 2;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      display: block;
     }
 
     #mask:hover {
       filter: drop-shadow(0 0 24px rgba(216, 180, 90, 0.3));
     }
 
+    /* При нажатии меняем только свечение, не размер и положение картинки. */
     #mask:active,
     #mask.pressed {
-      transform: scale(0.91);
-      filter: drop-shadow(0 0 28px rgba(240, 207, 114, 0.55));
+      transform: none;
+      filter: drop-shadow(0 0 25px rgba(245, 215, 121, 0.55)) brightness(1.08);
     }
 
     .particle {
@@ -158,15 +156,6 @@
 
     .back-link:hover {
       color: #f0cf72;
-      text-shadow: 0 0 9px rgba(240, 207, 114, 0.45);
-    }
-    
-    .back-link:active {
-      color: #fff0b0;
-      text-shadow:
-        0 0 6px rgba(240, 207, 114, 0.9),
-        0 0 16px rgba(240, 207, 114, 0.55);
-      transform: translateX(-50%);
     }
 
     .reward-overlay {
@@ -229,22 +218,6 @@
 
     .close-button:hover {
       color: #fff0b0;
-      text-shadow: 0 0 12px rgba(240, 207, 114, 0.7);
-    }
-
-    .close-button:active {
-      color: #fff4c2;
-      text-shadow:
-        0 0 7px rgba(240, 207, 114, 0.95),
-        0 0 18px rgba(240, 207, 114, 0.65);
-      transform: none;
-    }
-
-    button:focus-visible,
-    a:focus-visible,
-    #mask:focus-visible {
-      outline: 2px solid #f0cf72;
-      outline-offset: 4px;
     }
 
     .reward-number {
@@ -365,19 +338,12 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      /* Уважаем системную настройку уменьшения анимации. */
       .particle,
       .rare-star,
       .reward-overlay,
       .reward-card,
       .jackpot-star {
         animation-duration: 0.01ms;
-      }
-
-      #mask,
-      .back-link,
-      .close-button {
-        transition-duration: 0.01ms;
       }
     }
   </style>
@@ -452,6 +418,18 @@
     let characterTimer = null;
     let animationTimer = null;
     let characterMode = false;
+    
+    const imageCache = {};
+    ["mask.png", "mask-click.png", "character.png", "character-click.png"].forEach((src) => {
+      const image = new Image();
+      image.src = src;
+      imageCache[src] = image;
+    });
+
+    function setMaskImage(src) {
+      if (imageCache[src]) mask.src = imageCache[src].src;
+      else mask.src = src;
+    }
 
     let total = Number(localStorage.getItem("maskFerosams") || 0);
     let totalRileshes = Number(localStorage.getItem("maskRileshes") || 0);
@@ -517,8 +495,7 @@
       const number = makeElement("div", "reward-number", "+1 рилеш");
       const message = makeElement("div", "reward-message", "Совсем как настоящий!");
       const smallImage = document.createElement("img");
-      /* Класс совпадает с CSS-именем изображения награды. */
-      smallImage.className = "star-reward-small";
+      smallImage.className = "-reward-small";
       smallImage.src = "star-reward.png";
       smallImage.alt = "Награда за рилеш";
 
@@ -546,14 +523,14 @@
     function changeCharacterTemporarily() {
       clearTimeout(characterTimer);
       characterMode = true;
-      busy = false; // Персонажа можно нажимать, пока он отображается.
+      busy = false;
       mask.classList.remove("pressed");
-      mask.src = "character.png";
+      setMaskImage("character.png");
 
       characterTimer = setTimeout(() => {
         characterMode = false;
         mask.classList.remove("pressed");
-        mask.src = "mask.png";
+        setMaskImage("mask.png");
         busy = false;
       }, CHARACTER_DURATION);
     }
@@ -676,10 +653,10 @@
         createParticles();
         clearTimeout(animationTimer);
         mask.classList.add("pressed");
-        mask.src = "character-click.png";
+        setMaskImage("character-click.png");
         animationTimer = setTimeout(() => {
           mask.classList.remove("pressed");
-          if (characterMode) mask.src = "character.png";
+          if (characterMode) setMaskImage("character.png");
         }, 180);
         return;
       }
@@ -691,11 +668,11 @@
 
       const originalSrc = "mask.png";
       mask.classList.add("pressed");
-      mask.src = "mask-click.png";
+      setMaskImage("mask-click.png");
 
       setTimeout(() => {
         mask.classList.remove("pressed");
-        mask.src = originalSrc;
+        setMaskImage(originalSrc);
       }, 180);
 
       animationTimer = setTimeout(() => {
