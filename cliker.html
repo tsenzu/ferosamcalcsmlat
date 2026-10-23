@@ -358,6 +358,30 @@
         animation-duration: 0.01ms;
       }
     }
+
+button,
+a,
+img,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus,
+button:focus-visible,
+a:focus,
+a:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+button,
+img {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
   </style>
 </head>
 
