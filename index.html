@@ -68,6 +68,17 @@ button:hover{background:var(--gold2)}
 .price-row{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #51432665;padding:7px 0;font-size:13px}
 .price-rank{color:var(--muted)}
 .price-value{white-space:nowrap}
+.price-list .price-row,
+.price-list .price-row span,
+.price-list .price-row .star-small{
+  text-shadow:0 0 5px rgba(240,214,139,.45),0 0 12px rgba(216,183,93,.28);
+  transition:color 180ms ease,text-shadow 180ms ease;
+}
+.price-list .price-row:hover,
+.price-list .price-row:hover span{
+  color:#fff0b0;
+  text-shadow:0 0 5px rgba(240,214,139,.9),0 0 13px rgba(216,183,93,.65);
+}
 .star-small{color:var(--gold);padding-left:3px}
 .divider{text-align:center;color:#77602f;letter-spacing:12px;margin:20px 0}
 footer{text-align:center;color:#82734f;font-size:12px;margin:23px 0 8px}
@@ -151,22 +162,6 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{
   body{padding:20px 11px}.panel{padding:17px}
   .grid,.price-list{grid-template-columns:1fr}
 }
-  table td,
-table th {
-  text-shadow:
-    0 0 5px rgba(255, 215, 100, 0.8),
-    0 0 12px rgba(255, 180, 40, 0.5);
-  transition: text-shadow 0.2s ease;
-}
-
-table td:hover,
-table th:hover {
-  text-shadow:
-    0 0 6px rgba(255, 230, 140, 1),
-    0 0 14px rgba(255, 190, 50, 0.9),
-    0 0 22px rgba(255, 160, 20, 0.6);
-}
-
 </style>
 </head>
 <body>
@@ -265,7 +260,7 @@ const prices = {
   40:435,41:465,42:495,43:525,44:555,45:585,46:615,
   47:635,48:665,49:700,50:750
 };
-  
+а.
 const modes = {
   active:{name:"Активный набор",rate:1.5,symbol:"✦"},
   half:{name:"50/50 набор",rate:1,symbol:"◐"},
@@ -284,6 +279,7 @@ function formatNumber(value) {
     maximumFractionDigits:2
   });
 }
+
 function formatTime(hours) {
   if (hours <= 0) return "0 часов (0 дней 0 часов)";
 
@@ -308,6 +304,7 @@ function formatTime(hours) {
 
   return totalHours + " часов (" + parts.join(" ") + ")";
 }
+
 function addRanks(select) {
   for (let rank = 1; rank <= 50; rank++) {
     const option = document.createElement("option");
@@ -344,7 +341,7 @@ function renderPriceList() {
   }
 }
 renderPriceList();
-  
+
 const secretOverlay = $("secretOverlay");
 const secretImage = $("secretImage");
 const secretClose = $("secretClose");
