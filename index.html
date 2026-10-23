@@ -66,19 +66,19 @@ button:hover{background:var(--gold2)}
 .special a{color:var(--gold2);text-decoration:underline}
 .price-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
 .price-row{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #51432665;padding:7px 0;font-size:13px}
-.price-rank{color:var(--muted)}
-.price-value{white-space:nowrap}
 .price-list .price-row,
 .price-list .price-row span,
-.price-list .price-row .star-small{
-  text-shadow:0 0 5px rgba(240,214,139,.45),0 0 12px rgba(216,183,93,.28);
-  transition:color 180ms ease,text-shadow 180ms ease;
+.price-list .price-row .star-small {
+  text-shadow: 0 0 5px rgba(240,214,139,.45), 0 0 12px rgba(216,183,93,.28);
+  transition: color 180ms ease, text-shadow 180ms ease;
 }
 .price-list .price-row:hover,
-.price-list .price-row:hover span{
-  color:#fff0b0;
-  text-shadow:0 0 5px rgba(240,214,139,.9),0 0 13px rgba(216,183,93,.65);
+.price-list .price-row:hover span {
+  color: #fff0b0;
+  text-shadow: 0 0 5px rgba(240,214,139,.9), 0 0 13px rgba(216,183,93,.65);
 }
+.price-rank{color:var(--muted)}
+.price-value{white-space:nowrap}
 .star-small{color:var(--gold);padding-left:3px}
 .divider{text-align:center;color:#77602f;letter-spacing:12px;margin:20px 0}
 footer{text-align:center;color:#82734f;font-size:12px;margin:23px 0 8px}
@@ -115,48 +115,9 @@ footer{text-align:center;color:#82734f;font-size:12px;margin:23px 0 8px}
   border:1px solid #7b663a; padding:8px;
   background:#0d0b07;
   box-shadow:inset 0 0 18px #000, 0 0 15px rgba(0,0,0,.7);
-  opacity:0;
-  transform:scale(.97);
-}
-.secret-image.is-loaded{
-  animation: fragmentReveal 520ms cubic-bezier(.2,.75,.25,1) both;
-}
-@keyframes fragmentReveal{
-  from{opacity:0;transform:scale(.96);filter:brightness(.45) drop-shadow(0 0 0 rgba(216,183,93,0))}
-  to{opacity:1;transform:scale(1);filter:brightness(1) drop-shadow(0 0 12px rgba(216,183,93,.28))}
 }
 .secret-trigger{cursor:pointer}
 .secret-trigger:focus-visible{outline:1px dashed var(--gold2);outline-offset:3px}
-
-button,a,[role="button"]{
-  -webkit-tap-highlight-color:transparent;
-  transition:color 180ms ease, background-color 180ms ease,
-    border-color 180ms ease, box-shadow 180ms ease, text-shadow 180ms ease;
-}
-button:active{
-  color:#100e08;
-  background-color:var(--gold2);
-  box-shadow:0 0 8px rgba(216,183,93,.55),0 0 18px rgba(216,183,93,.2);
-}
-a:active,
-.secret-trigger:active{
-  color:#fff0b0;
-  text-shadow:0 0 5px rgba(240,214,139,.9),0 0 13px rgba(216,183,93,.65);
-}
-[role="button"]:active{
-  color:#fff0b0;
-  text-shadow:0 0 5px rgba(240,214,139,.9),0 0 13px rgba(216,183,93,.65);
-}
-@media(hover:hover){
-  button:hover{background-color:var(--gold2);box-shadow:0 0 9px rgba(216,183,93,.3)}
-  a:hover,.secret-trigger:hover{color:#fff0b0;text-shadow:0 0 9px rgba(216,183,93,.55)}
-}
-button:focus-visible,a:focus-visible,[role="button"]:focus-visible{
-  outline:2px solid var(--gold2);outline-offset:3px;
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-}
 
 @media(max-width:460px){
   body{padding:20px 11px}.panel{padding:17px}
@@ -260,7 +221,7 @@ const prices = {
   40:435,41:465,42:495,43:525,44:555,45:585,46:615,
   47:635,48:665,49:700,50:750
 };
-а.
+
 const modes = {
   active:{name:"Активный набор",rate:1.5,symbol:"✦"},
   half:{name:"50/50 набор",rate:1,symbol:"◐"},
@@ -346,32 +307,13 @@ const secretOverlay = $("secretOverlay");
 const secretImage = $("secretImage");
 const secretClose = $("secretClose");
 function openSecretFragment(number) {
-  secretImage.classList.remove("is-loaded");
-  secretImage.alt = `Скрытый фрагмент ${number}`;
   secretImage.src = `secret-fragment-${number}.png`;
+  secretImage.alt = `Скрытый фрагмент ${number}`;
   secretOverlay.hidden = false;
-  secretClose.focus();
 }
-secretImage.addEventListener("load", () => {
-  secretImage.classList.remove("is-loaded");
-  void secretImage.offsetWidth;
-  secretImage.classList.add("is-loaded");
-});
-secretImage.addEventListener("error", () => {
-  secretImage.classList.remove("is-loaded");
-  secretImage.alt = "Не удалось загрузить изображение. Проверь имя файла и путь.";
-});
-function closeSecretFragment() {
+secretClose.addEventListener("click", () => {
   secretOverlay.hidden = true;
   secretImage.removeAttribute("src");
-  secretImage.classList.remove("is-loaded");
-}
-secretClose.addEventListener("click", closeSecretFragment);
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && !secretOverlay.hidden) closeSecretFragment();
-});
-secretOverlay.addEventListener("click", event => {
-  if (event.target === secretOverlay) closeSecretFragment();
 });
 $("secretTrigger1").addEventListener("click", () => openSecretFragment(1));
 $("secretTrigger1").addEventListener("keydown", event => {
@@ -394,20 +336,8 @@ $("priceList").addEventListener("click", event => {
   }
 });
 $("priceList").addEventListener("keydown", event => {
-  if (event.key !== "Enter" && event.key !== " ") return;
-  const row = event.target.closest(".price-row");
-  if (!row) return;
-  if (row.dataset.secret === "2") {
+  if ((event.key === "Enter" || event.key === " ") && event.target.closest('[data-secret="2"]')) {
     event.preventDefault(); openSecretFragment(2);
-  } else if (row.dataset.hiddenSecret === "4") {
-    event.preventDefault();
-    hiddenFourthClicks++;
-    clearTimeout(hiddenFourthTimer);
-    hiddenFourthTimer = setTimeout(() => { hiddenFourthClicks = 0; }, 2200);
-    if (hiddenFourthClicks >= 7) {
-      hiddenFourthClicks = 0;
-      openSecretFragment(4);
-    }
   }
 });
 
@@ -479,7 +409,7 @@ $("calculate").addEventListener("click", () => {
 
   if (missing === 0) {
     $("resultNote").textContent =
-      "У тебя достаточно феросамов. Копить ничего не нужно";
+      "У тебя достаточной феросамов. Копить ничего не нужно";
   } else {
     $("resultNote").textContent =
       "Феросамы не списываются при повышении ранга.";
