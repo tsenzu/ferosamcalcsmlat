@@ -73,6 +73,19 @@
       transform: scale(0.91);
     }
 
+    #mask {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#mask:focus,
+#mask:focus-visible {
+  outline: none;
+}
+    
     .particle {
       position: absolute;
       z-index: 3;
