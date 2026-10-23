@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -42,21 +42,21 @@ button{
   background:var(--gold);color:#211707;
   border:1px solid var(--gold2);border-radius:2px;
   font:bold 16px Georgia,serif;cursor:pointer;
-  text-shadow:0 0 5px rgba(255,238,170,.7);
-  box-shadow:0 0 7px rgba(216,183,93,.28);
-  transition:background 180ms ease, text-shadow 180ms ease, box-shadow 180ms ease;
+  text-shadow:none; box-shadow:none;
+  transition:background 180ms ease, color 180ms ease, text-shadow 180ms ease;
 }
 button:hover, button:focus-visible{
   background:var(--gold2);
-  text-shadow:0 0 7px rgba(255,248,210,.95), 0 0 13px rgba(255,220,120,.7);
-  box-shadow:0 0 10px rgba(216,183,93,.55);
 }
+:focus{outline:none}
+:focus-visible{outline:1px dashed var(--gold2);outline-offset:3px}
 [role="button"], .secret-trigger {
-  transition:text-shadow 180ms ease, filter 180ms ease;
+  transition:text-shadow 220ms ease, color 220ms ease;
 }
 [role="button"]:hover, [role="button"]:focus-visible,
 .secret-trigger:hover, .secret-trigger:focus-visible {
-  text-shadow:0 0 5px rgba(240,214,139,.85), 0 0 13px rgba(216,183,93,.6);
+  color:#fff0b0;
+  text-shadow:0 0 5px rgba(240,214,139,.9), 0 0 13px rgba(216,183,93,.6);
 }
 .result{display:none}
 .result.visible{display:block}
@@ -83,8 +83,8 @@ button:hover, button:focus-visible{
 .price-list .price-row,
 .price-list .price-row span,
 .price-list .price-row .star-small {
-  text-shadow: 0 0 5px rgba(240,214,139,.45), 0 0 12px rgba(216,183,93,.28);
-  transition: color 180ms ease, text-shadow 180ms ease;
+  text-shadow:0 0 5px rgba(240,214,139,.5), 0 0 12px rgba(216,183,93,.32);
+  transition:color 220ms ease, text-shadow 220ms ease;
 }
 .price-list .price-row:hover,
 .price-list .price-row:hover span {
@@ -96,12 +96,12 @@ button:hover, button:focus-visible{
 .star-small{color:var(--gold);padding-left:3px}
 .divider{text-align:center;color:#77602f;letter-spacing:12px;margin:20px 0}
 footer{text-align:center;color:#82734f;font-size:12px;margin:23px 0 8px}
-
-/* Скрытые фрагменты в состаренных рамках */
+  
 .secret-overlay{
   position:fixed; inset:0; z-index:9999;
   display:flex; align-items:center; justify-content:center;
   padding:22px; background:rgba(4,3,2,.88); backdrop-filter:blur(4px);
+  animation:secretFadeIn 420ms ease both;
 }
 .secret-overlay[hidden]{display:none}
 .secret-frame{
@@ -130,7 +130,11 @@ footer{text-align:center;color:#82734f;font-size:12px;margin:23px 0 8px}
   border:1px solid #7b663a; padding:8px;
   background:#0d0b07;
   box-shadow:inset 0 0 18px #000, 0 0 15px rgba(0,0,0,.7);
+  animation:secretImageReveal 650ms cubic-bezier(.2,.75,.25,1) both;
 }
+@keyframes secretFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes secretImageReveal{from{opacity:0;transform:translateY(12px) scale(.97);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){.secret-overlay,.secret-image{animation:none}*{scroll-behavior:auto!important;transition:none!important}}
 .secret-trigger{cursor:pointer}
 .secret-trigger:focus-visible{outline:1px dashed var(--gold2);outline-offset:3px}
 
@@ -319,11 +323,13 @@ function renderPriceList() {
 }
 renderPriceList();
 
-// Окно скрытого фрагмента закрывается только крестиком.
 const secretOverlay = $("secretOverlay");
 const secretImage = $("secretImage");
 const secretClose = $("secretClose");
 function openSecretFragment(number) {
+  secretImage.classList.remove("secret-image");
+  void secretImage.offsetWidth;
+  secretImage.classList.add("secret-image");
   secretImage.src = `secret-fragment-${number}.png`;
   secretImage.alt = `Скрытый фрагмент ${number}`;
   secretOverlay.hidden = false;
