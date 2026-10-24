@@ -48,8 +48,20 @@ button{
 button:hover, button:focus-visible{
   background:var(--gold2);
 }
-:focus{outline:none}
-:focus-visible{outline:1px dashed var(--gold2);outline-offset:3px}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+*:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 1px dashed #f0d68b;
+  outline-offset: 3px;
+}
+
 [role="button"], .secret-trigger {
   transition:text-shadow 220ms ease, color 220ms ease;
 }
